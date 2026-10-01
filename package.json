@@ -1,0 +1,13 @@
+{
+  "name": "politiet-slot-checker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node slot-checker.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "playwright": "^1.55.0"
+  }
+}
