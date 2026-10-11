@@ -4,9 +4,6 @@ import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 const BOOKING_URL = "https://politietbooking.nemo-q.se/Booking/Booking/Index/Avtale";
-const START_DATE = new Date();
-START_DATE.setDate(START_DATE.getDate() + 1);
-START_DATE.setHours(0, 0, 0, 0);
 const END_DATE_EXCLUSIVE = new Date(2026, 9, 21);
 const PROFILE_DIR = process.env.PROFILE_DIR ?? ".browser-profile";
 
@@ -24,12 +21,16 @@ while (true) {
     await waitForBookingPage(page);
     await keepSessionAlive(page);
 
-    await page.locator("#datepicker").fill(formatDate(START_DATE));
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() + 1);
+    startDate.setHours(0, 0, 0, 0);
+
+    await page.locator("#datepicker").fill(formatDate(startDate));
     const searchButton = page.getByRole("button", { name: "Vis første ledige time", exact: true });
     await searchButton.click();
     await page.waitForLoadState("domcontentloaded");
 
-    const slots = await availableSlotsInRange(page, START_DATE, END_DATE_EXCLUSIVE);
+    const slots = await availableSlotsInRange(page, startDate, END_DATE_EXCLUSIVE);
     if (slots.length > 0) {
       const firstSlot = slots[0];
       console.log(`Found ${firstSlot.label}; selecting and confirming it.`);
@@ -41,7 +42,7 @@ while (true) {
       break;
     }
 
-    console.log(`${new Date().toLocaleTimeString()}: no appointment from ${formatDate(START_DATE)} through 2026-10-20.`);
+    console.log(`${new Date().toLocaleTimeString()}: no appointment from ${formatDate(startDate)} through 2026-10-20.`);
   } catch (error) {
     console.error(`${new Date().toLocaleTimeString()}: ${error.message}`);
   }
