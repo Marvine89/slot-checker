@@ -4,8 +4,10 @@ import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 const BOOKING_URL = "https://politietbooking.nemo-q.se/Booking/Booking/Index/Avtale";
-const START_DATE = new Date(2026, 9, 8);
-const END_DATE_EXCLUSIVE = new Date(2026, 9, 23);
+const START_DATE = new Date();
+START_DATE.setDate(START_DATE.getDate() + 1);
+START_DATE.setHours(0, 0, 0, 0);
+const END_DATE_EXCLUSIVE = new Date(2026, 9, 21);
 const PROFILE_DIR = process.env.PROFILE_DIR ?? ".browser-profile";
 
 const context = await chromium.launchPersistentContext(PROFILE_DIR, {
@@ -22,7 +24,7 @@ while (true) {
     await waitForBookingPage(page);
     await keepSessionAlive(page);
 
-    await page.locator("#datepicker").fill("2026-10-08");
+    await page.locator("#datepicker").fill(formatDate(START_DATE));
     const searchButton = page.getByRole("button", { name: "Vis første ledige time", exact: true });
     await searchButton.click();
     await page.waitForLoadState("domcontentloaded");
@@ -39,7 +41,7 @@ while (true) {
       break;
     }
 
-    console.log(`${new Date().toLocaleTimeString()}: no appointment from 2026-10-08 through 2026-10-22.`);
+    console.log(`${new Date().toLocaleTimeString()}: no appointment from ${formatDate(START_DATE)} through 2026-10-20.`);
   } catch (error) {
     console.error(`${new Date().toLocaleTimeString()}: ${error.message}`);
   }
@@ -52,6 +54,13 @@ async function waitForBookingPage(currentPage) {
     console.log("Waiting for you to reach the appointment selection page...");
     await currentPage.waitForTimeout(2_000);
   }
+}
+
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 async function keepSessionAlive(currentPage) {

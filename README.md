@@ -1,6 +1,6 @@
 # Politiet appointment checker
 
-Checks the authenticated rescheduling page every minute. When the page offers a slot from October 8 through October 22, 2026, it selects the earliest one, clicks **Bekreft ny tid**, and sends a macOS notification.
+Checks the authenticated rescheduling page every minute. When the page offers a slot from tomorrow through October 20, 2026, it selects the earliest one, clicks **Bekreft ny tid**, and sends a macOS notification.
 
 ## Run
 
